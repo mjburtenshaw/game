@@ -1,17 +1,18 @@
 import React from 'react';
+import utils from '../utils';
 
 class Ledger extends React.Component {
   render() {
     const { game } = this.props.pkg;
     const { ledger, bank } = game.state;
     const tables = Object.entries(ledger.index).map(([transactionType, categories]) => {
-      const tableTitle = transactionType.charAt(0).toUpperCase() + transactionType.slice(1);
+      const tableTitle = utils.game.capitalized(transactionType);
       const tableHeaders = [];
       const tableData = [];
       Object.entries(categories).forEach(([category, currencyType]) => {
-        const tableHeading = category.charAt(0).toUpperCase() + category.slice(1);
+        const tableHeading = utils.game.capitalized(category);
         tableHeaders.push(<th key={`${category}-heading`}>{tableHeading}</th>);
-        tableData.push(<td key={`${category}-data`}>{currencyType[bank.currency.type]}</td>)
+        tableData.push(<td key={`${category}-data`}>{`${bank.currency.symbol}${currencyType[bank.currency.type]}`}</td>)
       });
       return (
         <div key={transactionType}>

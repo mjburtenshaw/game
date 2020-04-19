@@ -4,4 +4,6 @@ const uuidv4 = () => {
   );
 }
 
-export default { uuidv4 };
+const capitalized = string => string.charAt(0).toUpperCase() + string.slice(1);
+
+export default { uuidv4, capitalized };
