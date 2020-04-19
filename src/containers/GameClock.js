@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
 class GameClock extends React.Component {
   constructor(props) {
@@ -7,21 +8,33 @@ class GameClock extends React.Component {
       gameDate: '',
       ticker: null,
     };
-    this.startGameClock = this.startGameClock.bind(this);
+    this.initializeGameClock = this.initializeGameClock.bind(this);
+    this.pauseGameClock = this.pauseGameClock.bind(this);
+    this.resumeGameClock = this.resumeGameClock.bind(this);
     this.tick = this.tick.bind(this);
     this.startTicker = this.startTicker.bind(this);
     this.stopTicker = this.stopTicker.bind(this);
   }
 
   componentDidMount() {
-    this.startGameClock();
+    this.initializeGameClock();
     this.startTicker();
   }
 
-  startGameClock() {
+  initializeGameClock() {
     let newState = this.state;
     newState.gameDate = new Date('January 1, 2020').toDateString();
     this.setState(newState);
+  }
+
+  pauseGameClock() {
+    this.stopTicker();
+    this.props.pkg.game.togglePause();
+  }
+
+  resumeGameClock() {
+    this.startTicker();
+    this.props.pkg.game.togglePause();
   }
 
   tick() {
@@ -50,10 +63,14 @@ class GameClock extends React.Component {
 
   render() {
     const { gameDate } = this.state;
+    const pauseButton = <Button onClick={event => this.pauseGameClock({ event })}>Pause</Button>;
+    const resumeButton = <Button onClick={event => this.resumeGameClock({ event })}>Resume</Button>;
+    const pauseResumeButton = this.props.pkg.game.state.isPaused ? resumeButton : pauseButton;
     return (
       <div id="game-clock">
         <h2>Date</h2>
         <p>{gameDate}</p>
+        {pauseResumeButton}
       </div>
     );
   }
