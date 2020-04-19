@@ -1,5 +1,6 @@
 import React from 'react';
 import GameClock from './GameClock';
+import Bank from './Bank';
 
 class Game extends React.Component {
   constructor(props) {
@@ -19,10 +20,12 @@ class Game extends React.Component {
   render() {
     const game = this;
     const gameClockProps = { game };
+    const bankProps = { game };
     return (
       <div id="game">
         <h1>Game</h1>
         <GameClock pkg={gameClockProps}/>
+        <Bank pkg={bankProps}/>
       </div>
     );
   }
