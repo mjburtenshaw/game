@@ -5,8 +5,7 @@ class GameClock extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      gameDate: '',
-      ticker: null,
+      ticker: null
     };
     this.initializeGameClock = this.initializeGameClock.bind(this);
     this.pauseGameClock = this.pauseGameClock.bind(this);
@@ -22,9 +21,8 @@ class GameClock extends React.Component {
   }
 
   initializeGameClock() {
-    let newState = this.state;
-    newState.gameDate = new Date('January 1, 2020').toDateString();
-    this.setState(newState);
+    const newDate = new Date('January 1, 2020').toDateString();
+    this.props.pkg.game.changeDate({ date: newDate });
   }
 
   pauseGameClock() {
@@ -38,12 +36,11 @@ class GameClock extends React.Component {
   }
 
   tick() {
-    let newState = this.state;
-    const oldDate = Date.parse(newState.gameDate);
+    const { game } = this.props.pkg;
+    const oldDate = Date.parse(game.state.date);
     const oneDay = 86400000;
     const newDate = new Date(oldDate + oneDay).toDateString();
-    newState.gameDate = newDate;
-    this.setState(newState);
+    game.changeDate({ date: newDate });
   }
 
   startTicker() {
@@ -62,14 +59,14 @@ class GameClock extends React.Component {
   }
 
   render() {
-    const { gameDate } = this.state;
+    const { game } = this.props.pkg;
     const pauseButton = <Button onClick={event => this.pauseGameClock({ event })}>Pause</Button>;
     const resumeButton = <Button onClick={event => this.resumeGameClock({ event })}>Resume</Button>;
-    const pauseResumeButton = this.props.pkg.game.state.isPaused ? resumeButton : pauseButton;
+    const pauseResumeButton = game.state.isPaused ? resumeButton : pauseButton;
     return (
       <div id="game-clock">
         <h2>Date</h2>
-        <p>{gameDate}</p>
+        <p>{game.state.date}</p>
         {pauseResumeButton}
       </div>
     );
