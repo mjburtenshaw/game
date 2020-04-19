@@ -1,6 +1,7 @@
 import React from 'react';
 import GameClock from './GameClock';
 import Bank from './Bank';
+import utils from '../utils';
 
 class Game extends React.Component {
   constructor(props) {
@@ -16,12 +17,16 @@ class Game extends React.Component {
         balances: {
           USD: 10000
         }
+      },
+      ledger: {
+        credit: [],
+        debit: []
       }
     };
     this.togglePause = this.togglePause.bind(this);
     this.changeDate = this.changeDate.bind(this);
-    this.creditBank = this.creditBank.bind(this);
-    this.debitBank = this.debitBank.bind(this);
+    this.submitTransactionToBank = this.submitTransactionToBank.bind(this);
+    this.addEntryToLedger = this.addEntryToLedger.bind(this);
   }
 
   togglePause() {
@@ -32,15 +37,23 @@ class Game extends React.Component {
     this.setState({ date });
   }
 
-  creditBank({ type, amount }) {
+  submitTransactionToBank({ transactionType, currencyType, amount }) {
     let newState = this.state;
-    newState.bank.balances[type] += amount;
+    if (transactionType === 'credit') newState.bank.balances[currencyType] += amount;
+    if (transactionType === 'debit') newState.bank.balances[currencyType] -= amount;
+    this.addEntryToLedger({ transactionType, currencyType, amount });
     this.setState(newState);
   }
 
-  debitBank({ type, amount }) {
+  addEntryToLedger({ transactionType, currencyType, amount }) {
     let newState = this.state;
-    newState.bank.balances[type] -= amount;
+    const transaction = {
+      id: utils.game.uuidv4(),
+      type: currencyType,
+      amount,
+      date: newState.date
+    };
+    newState.ledger[transactionType].push(transaction);
     this.setState(newState);
   }
 
