@@ -6,4 +6,6 @@ const uuidv4 = () => {
 
 const capitalized = string => string.charAt(0).toUpperCase() + string.slice(1);
 
-export default { uuidv4, capitalized };
+const msToDays = ms => Math.floor((((ms/1000)/60)/60)/24);
+
+export default { uuidv4, capitalized, msToDays };

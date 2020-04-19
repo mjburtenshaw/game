@@ -11,8 +11,8 @@ class Ledger extends React.Component {
       const tableData = [];
       Object.entries(categories).forEach(([category, currencyType]) => {
         const tableHeading = utils.game.capitalized(category);
-        tableHeaders.push(<th key={`${category}-heading`}>{tableHeading}</th>);
-        tableData.push(<td key={`${category}-data`}>{`${bank.currency.symbol}${currencyType[bank.currency.type]}`}</td>)
+        if (currencyType[bank.currency.type]) tableHeaders.push(<th key={`${category}-heading`}>{tableHeading}</th>);
+        if (currencyType[bank.currency.type]) tableData.push(<td key={`${category}-data`}>{`${bank.currency.symbol}${currencyType[bank.currency.type]}`}</td>)
       });
       return (
         <div key={transactionType}>

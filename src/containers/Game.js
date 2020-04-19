@@ -10,6 +10,12 @@ class Game extends React.Component {
     this.state = {
       isPaused: false,
       date: '',
+      electionDay: '',
+      daysUntilElectionDay: null,
+      player: {
+        yearElected: null,
+        isUpForElection: true,
+      },
       bank: {
         currency: {
           type: 'USD',
@@ -22,7 +28,13 @@ class Game extends React.Component {
       ledger: {
         credit: [],
         debit: [],
-        index: {}
+        index: {
+          debit: {
+            campaigning: {
+              USD: null
+            }
+          }
+        }
       }
     };
     this.togglePause = this.togglePause.bind(this);
@@ -37,7 +49,39 @@ class Game extends React.Component {
   }
 
   changeDate({ date }) {
+    let newState = this.state;
+    const isElectionDay = new Date(date).getTime() === new Date(newState.electionDay).getTime();
+    if (!newState.electionDay || isElectionDay) newState.electionDay = this.getNextElectionDay({ date });
+    if (isElectionDay) this.holdElections()
+    newState.daysUntilElectionDay = this.getDaysUntilElectionDay({ date });
+    newState.date = date;
     this.setState({ date });
+  }
+
+  getDaysUntilElectionDay({ date }) {
+    const currentDate = utils.game.msToDays(Date.parse(date));
+    const electionDay = utils.game.msToDays(Date.parse(this.state.electionDay));
+    const daysUntilElectionDay = electionDay - currentDate;
+    return daysUntilElectionDay;
+  }
+
+  getNextElectionDay({ date }) {
+    const currentDate = new Date(date);
+    let year = currentDate.getFullYear();
+    if (this.state.electionDay) year += 1;
+    const novOne = `Nov 01 ${year}`;
+    const msOfNovOne = Date.parse(novOne);
+    const dayOfNovOne = new Date(novOne).getDay();
+    const oneDay = 90000000;
+    let msUntilElectionDay = oneDay;
+    if      (dayOfNovOne === 0) msUntilElectionDay = oneDay * 2;
+    else if (dayOfNovOne === 6) msUntilElectionDay = oneDay * 3;
+    else if (dayOfNovOne === 5) msUntilElectionDay = oneDay * 4;
+    else if (dayOfNovOne === 4) msUntilElectionDay = oneDay * 5;
+    else if (dayOfNovOne === 3) msUntilElectionDay = oneDay * 6;
+    else if (dayOfNovOne === 2) msUntilElectionDay = oneDay * 7;
+    const electionDay = new Date(msOfNovOne + msUntilElectionDay).toDateString();
+    return electionDay;
   }
 
   submitTransactionToBank({ transactionType, currencyType, amount, category }) {
@@ -74,6 +118,20 @@ class Game extends React.Component {
       });
     });
     newState.ledger.index = transactionIndex;
+    this.setState(newState);
+  }
+
+  holdElections() {
+    let newState = this.state;
+    if (!newState.player.yearElected || newState.player.isUpForElection) {
+      const playerWasElected = newState.ledger.index.debit.campaigning[newState.bank.currency.type] > 1000;
+      if (playerWasElected) {
+        newState.player.yearElected = new Date(newState.date).getFullYear();
+        newState.player.isUpForElection = false;
+      };
+    } else if (newState.player.yearElected) {
+      newState.player.isUpForElection = new Date(newState.date).getFullYear() - newState.player.yearElected === 1;
+    }
     this.setState(newState);
   }
 

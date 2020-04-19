@@ -21,7 +21,7 @@ class Clock extends React.Component {
   }
 
   initializeClock() {
-    const newDate = new Date('January 1, 2020').toDateString();
+    const newDate = new Date('October 1, 2020').toDateString();
     this.props.pkg.game.changeDate({ date: newDate });
   }
 
@@ -38,7 +38,7 @@ class Clock extends React.Component {
   tick() {
     const { game } = this.props.pkg;
     const oldDate = Date.parse(game.state.date);
-    const oneDay = 86400000;
+    const oneDay = 90000000;
     const newDate = new Date(oldDate + oneDay).toDateString();
     game.changeDate({ date: newDate });
   }
@@ -68,6 +68,8 @@ class Clock extends React.Component {
         <h2>Date</h2>
         <p>{game.state.date}</p>
         {pauseResumeButton}
+        <h2>Days Until Election Day</h2>
+        {game.state.daysUntilElectionDay}
       </div>
     );
   }
