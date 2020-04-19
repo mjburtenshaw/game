@@ -14,6 +14,7 @@ class Bank extends React.Component {
       }
     };
     this.credit = this.credit.bind(this);
+    this.debit = this.debit.bind(this);
   }
 
   credit({ type, amount }) {
@@ -22,14 +23,22 @@ class Bank extends React.Component {
     this.setState(newState);
   }
 
+  debit({ type, amount }) {
+    let newState = this.state;
+    newState.balances[type] -= amount;
+    this.setState(newState);
+  }
+
   render() {
     const { currency, balances } = this.state;
-    const fundraiseButton = <Button onClick={event => this.credit({ event, type: currency.type, amount: 100 })}>Raise Funds +100</Button>
+    const fundraiseButton = <Button onClick={event => this.credit({ event, type: currency.type, amount: 100 })}>Raise Funds +100</Button>;
+    const campaignButton = <Button onClick={event => this.debit({ event, type: currency.type, amount: 100 })}>Campaign -100</Button>;
     return (
       <div id="bank">
         <h2>Bank</h2>
         <p>{currency.symbol}{balances[currency.type]}</p>
         {fundraiseButton}
+        {campaignButton}
       </div>
     );
   }
