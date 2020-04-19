@@ -1,6 +1,7 @@
 import React from 'react';
-import GameClock from './GameClock';
+import Clock from './Clock';
 import Bank from './Bank';
+import Ledger from './Ledger';
 import utils from '../utils';
 
 class Game extends React.Component {
@@ -20,13 +21,15 @@ class Game extends React.Component {
       },
       ledger: {
         credit: [],
-        debit: []
+        debit: [],
+        index: {}
       }
     };
     this.togglePause = this.togglePause.bind(this);
     this.changeDate = this.changeDate.bind(this);
     this.submitTransactionToBank = this.submitTransactionToBank.bind(this);
     this.addEntryToLedger = this.addEntryToLedger.bind(this);
+    this.indexTransactions = this.indexTransactions.bind(this);
   }
 
   togglePause() {
@@ -37,35 +40,54 @@ class Game extends React.Component {
     this.setState({ date });
   }
 
-  submitTransactionToBank({ transactionType, currencyType, amount }) {
+  submitTransactionToBank({ transactionType, currencyType, amount, category }) {
     let newState = this.state;
     if (transactionType === 'credit') newState.bank.balances[currencyType] += amount;
     if (transactionType === 'debit') newState.bank.balances[currencyType] -= amount;
-    this.addEntryToLedger({ transactionType, currencyType, amount });
+    this.addEntryToLedger({ transactionType, currencyType, amount, category });
     this.setState(newState);
   }
 
-  addEntryToLedger({ transactionType, currencyType, amount }) {
+  addEntryToLedger({ transactionType, currencyType, amount, category }) {
     let newState = this.state;
     const transaction = {
       id: utils.game.uuidv4(),
-      type: currencyType,
+      category,
+      currencyType,
       amount,
       date: newState.date
     };
     newState.ledger[transactionType].push(transaction);
     this.setState(newState);
+    this.indexTransactions();
+  }
+
+  indexTransactions() {
+    let newState = this.state;
+    const transactionIndex = {};
+    Object.entries(newState.ledger).forEach(([transactionType, transactions]) => {
+      if (transactionType !== 'index') transactions.forEach(t => {
+        if (!transactionIndex[transactionType]) transactionIndex[transactionType] = {};
+        if (!transactionIndex[transactionType][t.category]) transactionIndex[transactionType][t.category] = {};
+        if (!transactionIndex[transactionType][t.category][t.currencyType]) transactionIndex[transactionType][t.category][t.currencyType] = 0;
+        transactionIndex[transactionType][t.category][t.currencyType] += t.amount;
+      });
+    });
+    newState.ledger.index = transactionIndex;
+    this.setState(newState);
   }
 
   render() {
     const game = this;
-    const gameClockProps = { game };
+    const clockProps = { game };
     const bankProps = { game };
+    const ledgerProps = { game };
     return (
       <div id="game">
         <h1>Game</h1>
-        <GameClock pkg={gameClockProps}/>
+        <Clock pkg={clockProps}/>
         <Bank pkg={bankProps}/>
+        <Ledger pkg={ledgerProps}/>
       </div>
     );
   }

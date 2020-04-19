@@ -1,36 +1,36 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-class GameClock extends React.Component {
+class Clock extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       ticker: null
     };
-    this.initializeGameClock = this.initializeGameClock.bind(this);
-    this.pauseGameClock = this.pauseGameClock.bind(this);
-    this.resumeGameClock = this.resumeGameClock.bind(this);
+    this.initializeClock = this.initializeClock.bind(this);
+    this.pauseClock = this.pauseClock.bind(this);
+    this.resumeClock = this.resumeClock.bind(this);
     this.tick = this.tick.bind(this);
     this.startTicker = this.startTicker.bind(this);
     this.stopTicker = this.stopTicker.bind(this);
   }
 
   componentDidMount() {
-    this.initializeGameClock();
+    this.initializeClock();
     this.startTicker();
   }
 
-  initializeGameClock() {
+  initializeClock() {
     const newDate = new Date('January 1, 2020').toDateString();
     this.props.pkg.game.changeDate({ date: newDate });
   }
 
-  pauseGameClock() {
+  pauseClock() {
     this.stopTicker();
     this.props.pkg.game.togglePause();
   }
 
-  resumeGameClock() {
+  resumeClock() {
     this.startTicker();
     this.props.pkg.game.togglePause();
   }
@@ -60,8 +60,8 @@ class GameClock extends React.Component {
 
   render() {
     const { game } = this.props.pkg;
-    const pauseButton = <Button onClick={event => this.pauseGameClock({ event })}>Pause</Button>;
-    const resumeButton = <Button onClick={event => this.resumeGameClock({ event })}>Resume</Button>;
+    const pauseButton = <Button onClick={event => this.pauseClock({ event })}>Pause</Button>;
+    const resumeButton = <Button onClick={event => this.resumeClock({ event })}>Resume</Button>;
     const pauseResumeButton = game.state.isPaused ? resumeButton : pauseButton;
     return (
       <div id="game-clock">
@@ -77,4 +77,4 @@ class GameClock extends React.Component {
   }
 };
 
-export default GameClock;
+export default Clock;
